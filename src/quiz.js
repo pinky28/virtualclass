@@ -17,7 +17,7 @@
       usersFinishedQz: [],
       quizJSON: {},
       attemptedUsers: {},
-      cmid: 2, // TODO : courseid of moodle
+      cmid: 0, // TODO : courseid of moodle
       // exportfilepath: window.exportfilepath,
       quizSt: {}, // used for storage
       quizAttempted: {}, // used for storage
@@ -29,6 +29,7 @@
         // const urlquery = virtualclass.vutil.getUrlVars(exportfilepath);
         const urlquery = virtualclass.vutil.getUrlVars(window.webapi);
         this.cmid = urlquery.cmid;
+        this.token =  wbUser.token;
 
         if (!roles.hasAdmin() || (roles.isEducator())) {
           if (roles.isStudent()) {
@@ -167,8 +168,9 @@
         const formData = new FormData();
         formData.append('cmid', this.cmid);
         formData.append('user', this.uid);
+        formData.append('token', this.token);
         const scope = this;
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=congrea_quiz`, formData).then((data) => {
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_quiz_list`, formData).then((data) => {
           this.initToFetch = true;
           const getContent = data.data;
           if (getContent.status === 0) {
@@ -285,8 +287,9 @@
         formData.append('cmid', this.cmid);
         formData.append('user', this.uid);
         formData.append('qid', quizitem.id);
+        formData.append('token', this.token);
         scope = this;
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=congrea_get_quizdata`, formData, { transformResponse: res => res }).then((data) => {
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_get_quizdata`, formData, { transformResponse: res => res }).then((data) => {
           if (scope.isJson(data.data)) {
             scope.quizJSON = data.data;
             $('#slickQuiz').slickQuiz({
@@ -395,9 +398,11 @@
         formData.append('cmid', vthis.cmid);
         formData.append('qzid', vthis.qzid);
         formData.append('user', vthis.uid);
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=congrea_add_quiz`, formData).then((msg) => {
-          if (msg.data !== 'ture') {
-            // console.log('Quiz data not saved in congrea');
+        formData.append('token', vthis.token);
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_add_quiz`, formData).then((msg) => {
+          //console.log(typeof msg.data);
+          if (msg.data !== true) { //boolean true
+            console.log('Quiz data not saved in congrea');
           }
         })
           .catch((error) => {
@@ -632,14 +637,16 @@
         const formData = new FormData();
         formData.append('cmid', vthis.cmid);
         formData.append('qzid', vthis.qzid);
+        formData.append('token', vthis.token);
         formData.append('user', userId);
         formData.append('grade', grade);
         formData.append('timetaken', tt);
         formData.append('qusattempted', quesAttempted);
         formData.append('currectans', correctAns);
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=congrea_quiz_result`, formData).then((data) => {
-          if (data.data !== 'ture') {
-            // console.log('Quiz data not saved in congrea');
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_quiz_result`, formData).then((data) => {
+          //if (data.data !== ture) {
+          if (!data.data) {
+              console.log('Quiz result not saved in congrea');
           }
         })
           .catch((error) => {

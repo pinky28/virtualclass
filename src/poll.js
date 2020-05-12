@@ -38,6 +38,7 @@
         // const urlquery = virtualclass.vutil.getUrlVars(exportfilepath);
         const urlquery = virtualclass.vutil.getUrlVars(window.webapi);
         this.cmid = urlquery.cmid;
+        this.token =  wbUser.token;
         if (this.timer) {
           clearInterval(this.timer);
         }
@@ -64,8 +65,9 @@
         const formData = new FormData();
         formData.append('dataToSave', JSON.stringify(data));
         formData.append('user', virtualclass.gObj.uid);
+        formData.append('token', that.token);
         // TODO Handle more situations
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_save`, formData).then((msg) => {
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_save`, formData).then((msg) => {
           const getContent = msg.data;
           const { options } = getContent;
           const obj = {};
@@ -114,8 +116,9 @@
         const formData = new FormData();
         formData.append('editdata', JSON.stringify(data));
         formData.append('user', virtualclass.gObj.uid);
+        formData.append('token', that.token);
         // TODO Handle more situations
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_update`, formData).then((msg) => {
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_update`, formData).then((msg) => {
           const getContent = msg.data;
           // console.log(getContent);
           that.updatePollList(getContent);
@@ -158,11 +161,13 @@
       interfaceToFetchList(category) {
         const that = this;
         const formData = new FormData();
-        formData.append('category', JSON.stringify(category));
+        //formData.append('category', JSON.stringify(category));
+        formData.append('category', parseInt(category));
         formData.append('user', virtualclass.gObj.uid);
+        formData.append('token', that.token);
         virtualclass.recorder.items = []; // empty on each chunk sent
         // TODO Handle more situations
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_data_retrieve`, formData).then((msg) => {
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_data_retrieve`, formData).then((msg) => {
           // console.log("fetched" + msg);
           //  later in php file
           const getContent = msg.data;
@@ -192,7 +197,8 @@
         const formData = new FormData();
         formData.append('qid', JSON.stringify(qid));
         formData.append('user', virtualclass.gObj.uid);
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_delete`, formData).then((msg) => {
+        formData.append('token', that.token);
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_delete`, formData).then((msg) => {
           const getContent = msg.data;
           if (msg.data && msg.data !== '') {
             that.interfaceToFetchList(getContent);
@@ -203,10 +209,12 @@
           });
       },
       interfaceToDelOption(optionId) {
+        const that = this;
         const formData = new FormData();
         formData.append('id', JSON.stringify(optionId));
         formData.append('user', virtualclass.gObj.uid);
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_option_drop`, formData).then(() => {
+        formData.append('token', that.token);
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_option_drop`, formData).then(() => {
           // nothing to do
         })
           .catch((error) => {
@@ -218,7 +226,8 @@
         const formData = new FormData();
         formData.append('saveResult', JSON.stringify(data));
         formData.append('user', virtualclass.gObj.uid);
-        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=poll_result`, formData).then((msg) => {
+        formData.append('token', that.token);
+        virtualclass.xhr.vxhr.post(`${window.webapi}&methodname=mod_congrea_poll_result`, formData).then((msg) => {
           if (msg.data !== '' || (msg.statusText === 'OK' && msg.data === 0)) {
             that.interfaceToFetchList(msg.data);
           }
@@ -1031,11 +1040,6 @@
             poll.options[i] = opt[j].value;
             j++;
           }
-          // var obj1 = {
-          //   question,
-          //   options: opts,
-          //
-          // };
           virtualclass.poll[pollType][index].questiontext = document.getElementById('q').value;
 
           virtualclass.poll.dataToStd.question = virtualclass.poll[pollType][index].questiontext;

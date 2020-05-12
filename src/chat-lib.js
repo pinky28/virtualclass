@@ -78,7 +78,7 @@ function displayChatUserList(totUsers) {
           <div id='subchat' class='playMode ${userRole}'>${myDivResult}</div>`;
           // console.log('====> UserList is created 1d finally');
         } else {
-          chat_div.shadowRoot.innerHTML = `<link rel='stylesheet' type='text/css' 
+          chat_div.shadowRoot.innerHTML = `<link rel='stylesheet' type='text/css'
           href='${whiteboardPath}css/modules/chat-container.css'>
           <div id='subchat' class='${userRole}'>${myDivResult}</div>`;
           // console.log('====> UserList is created 1d finally');
@@ -135,9 +135,9 @@ function displayChatOfflineUserList(users) {
     divContainer.id = 'melistcontainer';
   }
   for (let i = 0; i < users.length; i++) {
-    if (!virtualclass.vutil.alreadyConnected(users[i].userid)) {
-      if (users[i].userid != virtualclass.gObj.uid) {
-        if (document.getElementById(`video${users[i].userid}`) == null) {
+    if (!virtualclass.vutil.alreadyConnected(users[i].id)) {
+      if (users[i].id != virtualclass.gObj.uid) {
+        if (document.getElementById(`video${users[i].id}`) == null) {
           myDivResult = $('#chat_div').memberlist('option').userSent(users[i]);
           virtualclass.media.addUserRole(myDivResult, users[i].role);
           divContainer.appendChild(myDivResult);
